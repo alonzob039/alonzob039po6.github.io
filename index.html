@@ -1,74 +1,79 @@
-<!DOCTYPE html>
-<html><head><title>speeding tickets</title>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-
- <script src="https://unpkg.com/vue@next"></script> 
-
+<head> <meta charset="utf-8">
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.1/angular.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.1/angular-route.js"></script>
+  <title>Home</title>
 </head>
-<body>
 
-<div class="container">
-<nav class="navbar navbar-inverse">
-
-    <div class="navbar-header">
-        <a class="navbar-brand" href="#">Our Website</a>
+<body ng-app="myApp" ng-controller="mainController">
+  <nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <a class="navbar-brand">Our Website</a>
+      </div>
+      <div>
+        <ul class="nav navbar-nav">
+          <li class="active"><a href="#home">Home</a></li>
+          <li><a href="#advisees">Advisees</a></li>
+          <li><a href="#gpa">GPA</a></li>
+        </ul>
+      </div>
     </div>
-    <div>
-       <ul class="nav navbar-nav">
-           <li class="active"><a href="index.html">All Tickets</a></li>
-           <li><a href="25over.html">25mph or move over</a></li>
-       </ul>
-    </div>
+  </nav>
+  <div class="container">
+    <div ng-view></div>
+  </div>
+</body>
 
-</nav>    <!-- end nav-bar -->
+<script type="text/javascript">
+  var url = "students.json";
+  var app = angular.module("myApp", ['ngRoute']);
 
-<div id="ticketApp">
-
-     <h2>Tickets July 4, 2014, Minneapolis/St. Paul</h2>
-          
-          <table class="table table-bordered table-striped">
-              <tr>
-                  <th>Ticket ID</th>
-                  <th>Time</th>
-                  <th>Posted Speed</th>
-                  <th>MPH Over</th>
-                  <th>Violator Sex</th>
-              </tr>
-              <tr v-for = "ticket in tickets">
-                  <td>{{ticket.tid}}</td>
-                  <td>{{ticket.stop_time}}</td>
-                  <td>{{ticket.posted_speed}}</td>
-                  <td>{{ticket.actual_speed - ticket.posted_speed}}</td> 
-                  <td>{{ticket.violator_sex}}</td>
-              </tr>
-         </table>
+  $(document).ready(function() {
+    $(".nav a").on("click", function () {
+      $(".nav").find(".active").removeClass("active");
+      $(this).parent().addClass("active");
+    });
+  });
   
-</div>   <!-- end gpaApp -->
-</div>   <!-- end class= 'container' -->
+  app.config(function ($routeProvider) {
+    $routeProvider
+      .when('/', {
+        templateUrl : 'home.html',
+        controller : 'mainController'
+      })
+      .when('/home', {
+        templateUrl : 'home.html',
+        controller : 'mainController'
+      })
+      .when('/advisees', {
+        templateUrl : 'advisees.html',
+        controller : 'myCtrl'
+      })
+      .when("/gpa", {
+        templateUrl : 'gpa.html',
+        controller : 'gpaCtrl'
+      })
+      .otherwise({
+        redirectTo : 'home.html'
+      });
+  });
 
-<script>
-       let app = Vue.createApp({
-            data() {     // returns an object of data
-                return {
-                    tickets: [],           // array to hold student data
-                }
-            },
-            created() {      // section executes as page loads
-                this.getData()  // load json data as page loads
-            },
-            methods: {    // ajax request
-                async getData() {
-                    const response = await fetch('tickets1.json')
-                    this.tickets = await response.json()
-                    //tickets = data.filter( (item) => item.major == majSelect );     
-                },
-            }
-          })
-      
-      app.mount('#ticketApp')   //in which div to mount the vue app
-		  
+  app.controller('mainController', function($scope) {
 
+  });
+
+  app.controller('myCtrl', function($scope, $http) {
+    $http.get(url).then(function (response) {
+      $scope.tableData = response.data;
+    });
+  });
+
+  app.controller("gpaCtrl", function($scope, $http) {
+    $http.get(url).then(function (response) {
+      $scope.tableData = response.data;
+    });
+  });
 </script>
-</body></html>
